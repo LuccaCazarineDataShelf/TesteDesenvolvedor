@@ -4,6 +4,7 @@ import org.example.ConexaoBanco.Conexao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CalcadosModel {
@@ -20,10 +21,11 @@ public class CalcadosModel {
     private String descricao;
     private int calcadoId;
 
-    public void adicionarCalcado(){
+    public void editarCalcado(){
         try(Connection conexao = Conexao.conectar()){
-            String sql = "INSERT INTO Calcados (tamanho, categoria, cor, preco, marca, dataCadastro, qtdEstoque, descricao, calcadoId)" +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "UPDATE Calcados SET tamanho = ?, categoria = ?, cor = ?, preco = ?," +
+                    " marca = ?, dataCadastro = ?, qtdEstoque = ?, descricao = ? " +
+                    "WHERE idCalcado = ?";
             try(PreparedStatement stmt = conexao.prepareStatement(sql)){
                 stmt.setFloat(1, this.tamanho);
                 stmt.setString(2, this.categoria);
@@ -33,16 +35,15 @@ public class CalcadosModel {
                 stmt.setDouble(6, this.dataCadastro);
                 stmt.setInt(7, this.qtdEstoque);
                 stmt.setString(8, this.descricao);
-                stmt.setInt(9, this.calcadoId);
+                stmt.setInt(9, this.getCalcadoId());
 
                 stmt.executeUpdate();
-                System.out.println("Calçado adicionado com sucesso!");
+
+                System.out.println("Calçado editado com sucesso!");
             }
-        }catch (SQLException e){
-            System.err.println("Erro ao adicionar calçado: " + e.getMessage());
+        } catch (SQLException e){
+            System.err.println("Erro ao editar calçado: " + e.getMessage());
         }
-    }
-    public void editarCalcado(){
     }
     public void excluirCalcado(int calcadoId){
         try(Connection conexao = Conexao.conectar()){
@@ -60,12 +61,38 @@ public class CalcadosModel {
             System.err.println("Erro ao excluir o calçado: " + e.getMessage());
         }
     }
-    public void buscarCalcado(){
+    public CalcadosModel buscarCalcadoPorId(){
+        CalcadosModel calcado = null;
+
+        try(Connection conexao = Conexao.conectar()){
+            String sql = "SELECT * FROM calcados WHERE idCalcado = ?";
+            try(PreparedStatement stmt = conexao.prepareStatement(sql)){
+                stmt.setInt(1, this.calcadoId);
+                try(ResultSet resultado = stmt.executeQuery()){
+                    if(resultado.next()){
+                        calcado = new CalcadosModel(
+                          resultado.getFloat("tamanho"),
+                          resultado.getString("categoria"),
+                          resultado.getString("cor"),
+                          resultado.getFloat("preço"),
+                          resultado.getString("marca"),
+                          resultado.getDouble("dataCadastro"),
+                          resultado.getInt("qtdEstoque"),
+                          resultado.getString("descrição"),
+                          resultado.getInt("calcadoId")
+                        );
+                    }
+                }
+            }
+        }catch (SQLException e){
+            System.err.println("Erro ao buscar o calçado: " + e.getMessage());
+        }
+        return calcado;
     }
     public void filtrarCalcado(){
     }
 
-    public CalcadosModel(float tamanho, String categoria, String cor, float preco, String marca, double dataCadastro, int qtdEstoque, String descricao) {
+    public CalcadosModel(float tamanho, String categoria, String cor, float preco, String marca, double dataCadastro, int qtdEstoque, String descricao, int calcadoId) {
         this.tamanho = tamanho;
         this.categoria = categoria;
         this.cor = cor;
@@ -74,6 +101,7 @@ public class CalcadosModel {
         this.dataCadastro = dataCadastro;
         this.qtdEstoque = qtdEstoque;
         this.descricao = descricao;
+        this.calcadoId = calcadoId;
     }
 
     public float getTamanho() {
@@ -138,5 +166,13 @@ public class CalcadosModel {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public int getCalcadoId() {
+        return calcadoId;
+    }
+
+    public void setCalcadoId(int calcadoId) {
+        this.calcadoId = calcadoId;
     }
 }

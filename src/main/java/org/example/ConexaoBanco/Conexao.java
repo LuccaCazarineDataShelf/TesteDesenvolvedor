@@ -7,9 +7,9 @@ import java.sql.SQLOutput;
 import org.example.ConexaoBanco.Conexao;
 
 public class Conexao {
-    public static final String URL = "jdbc:sqlserver://localhost:1433;database=master;user=sa;password=Cazarine2003;trustServerCertificate=false; encrypt=false";
-    private static final String USUARIO = "sa";
-    private static final String SENHA = "Cazarine2003";
+    public static final String URL = "****";
+    private static final String USUARIO = "****";
+    private static final String SENHA = "***";
 
     public static Connection conectar(){
         Connection conexao = null;
